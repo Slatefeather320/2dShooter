@@ -11,7 +11,7 @@ e to spawn enemies at random position
 z to open commands in terminal
 
 Commands:
-pspeed [x] | Changes player speed to x
+pspeed [x] | Changes player speed to x 
 bspeed [x] | Changes bullet speed to x
 lasers [x] | Changes how many times laser bounces off wall to x, set to 0 or negitive value for no laser
 bounces [x] | Changes how many times bullets can bounce of walls before disappearing
