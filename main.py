@@ -1,8 +1,7 @@
-#taken from local file version 1.4
 import pygame, random, math
 width = 600; height = 600
 window = pygame.display.set_mode((width, height)) 
-pygame.display.set_caption('Puppy Shooting Game')
+pygame.display.set_caption('2D Shooter Engine v1.4')
 fps = 90
 dt = 1/fps
 
@@ -249,7 +248,7 @@ class Menu:
                 if self.command[0] == "lasers":
                     p.maxLaser = int(self.command[1])
                 if self.command[0] == "cooldown":
-                    b.cooldown = int(self.command[1])
+                    b.cooldown = float(self.command[1])
                 if self.command[0] == "height":
                     height = int(self.command[1])
                     window = pygame.display.set_mode((width, height)) 
