@@ -1,7 +1,7 @@
 # 2dShooter
 I have been working on porting an old Scratch game to python. In the process of doing so, I have made this 2d shooter game engine in the process. 
 
-Version 1.8 3/2/2024
+Version 1.9 15/2/2024
 needs python, pygame, and tkinter to run
 
 Controls:
@@ -11,6 +11,7 @@ e to spawn enemies at random position
 z to open commands in terminal
 x to open shop (feature not fully implimented)
 c to toggle ui
+r to spawn test attacker enemy 
 
 Commands:
 pspeed [x] | Changes player speed to x 
