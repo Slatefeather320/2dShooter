@@ -1,7 +1,7 @@
 import pygame, random, math, tkinter
 width = 600; height = 600
 window = pygame.display.set_mode((width, height)) 
-pygame.display.set_caption('2D Shooter Engine v1.8')
+pygame.display.set_caption('2D Shooter Engine v1.9')
 fps = 90
 dt = 1/fps
 pygame.init()
@@ -211,33 +211,47 @@ class Bullets:
 
 class Enemy:
     def __init__(self):
-        self.value = 0
+        self.values = []
         self.number = 0
         self.poss = []
         self.dead = []
+        self.modes = []
+        self.lerpStage = []
+        self.currentTargets = []
+        self.timeToLerp = 300
     def kill(self):
         killed = 0
         for i in self.dead:
             self.poss.pop(i-killed)
+            self.values.pop(i-killed)
+            self.modes.pop(i-killed)
+            self.lerpStage.pop(i-killed)
+            self.currentTargets.pop(i-killed)
             self.number -= 1
             killed+=1
         self.dead = []
     def spawnAt(self,point, value):
         self.number += 1
         self.poss.append(point)
-        self.value = value
+        self.values.append(value)
+        self.modes.append("static")
+        self.lerpStage.append(0)
+        self.currentTargets.append("none")
     def spawnRandom(self):
         point = pygame.Vector2()
         point[:] = random.randint(0,width),random.randint(0,height)
         self.number += 1
         self.poss.append(point)
-        self.value = random.randint(4,8)
-    def move(self):
+        self.values.append(random.randint(4,8)) 
+        self.modes.append("static")
+        self.lerpStage.append(0)
+        self.currentTargets.append("none")
+    def collisions(self):
         for i in range(0,self.number):
             for bi in range(0,b.number):
                 vect = self.poss[i] - b.poss[bi]
                 if vect.length() < 20:
-                    p.money += self.value
+                    p.money += self.values[i]
                     self.dead.append(i)
                     if b.throughs[bi]>0:
                         b.throughs[bi] -= 1
@@ -245,12 +259,35 @@ class Enemy:
                         if bi not in b.dead: #i have no idea why this game doesnt work without this check, ideally there is noreason the same bullet should be appended to dead twice but sometimes it is
                             b.dead.append(bi)
                     break
+    def spawnAttacker(self):
+        self.number += 1
+        self.poss.append(pygame.Vector2(width,height/2))
+        self.values.append(random.randint(4,8))
+        self.modes.append("attacker")
+        self.lerpStage.append(0)
+        self.currentTargets.append(pygame.Vector2(width - 30, random.randint(0,height)))
+    def chooseTarget(self, index):
+        self.lerpStage[index] = 0
+        if self.poss[index][0] > p.pos.x+30:
+            self.currentTargets[index] = pygame.Vector2(self.poss[index].x - 30, random.randint(0,height))
+        else:
+            self.currentTargets[index] = pygame.Vector2(self.poss[index].x - (self.poss[index]-p.pos).normalize().x*15 , self.poss[index].y - (self.poss[index]-p.pos).normalize().y*30)
+        if (self.poss[index] - p.pos).magnitude() < 30:
+            print("hitreg")
+    def attack(self):
+        for i in range(0,self.number):
+            if self.modes[i] == "attacker":
+                self.poss[i] = pygame.Vector2.lerp(self.poss[i],self.currentTargets[i],self.lerpStage[i]/self.timeToLerp)
+                self.lerpStage[i] += 1
+                if self.lerpStage[i] > 99:
+                    self.chooseTarget(i)
     def render(self):
         for i in range(0,self.number):
             pygame.draw.circle(window, (230,150,150), self.poss[i], 20)
     def main(self):
         self.kill()
-        self.move()
+        self.collisions()
+        self.attack()
         self.render()
 
 class Menu:
@@ -423,3 +460,5 @@ while running:
                 b.speed = 2400*dt
                 b.MaxThrough = 5
                 b.maxBounce = 3
+            if event.key == pygame.K_r:
+                e.spawnAttacker()
